@@ -1,12 +1,19 @@
 # Codebook: `spotify_tracks_analysis.csv`
 
-Stratified sample of **20,000 tracks** from Yamac Eren Ay’s
+About **21,000 tracks** from Yamac Eren Ay’s
 [Spotify Dataset 1921–2020, 600k+ Tracks](https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks)
 (Kaggle discussion: [Large Spotify Dataset](https://www.kaggle.com/discussions/general/153757)).
 
-Rows are sampled so each decade from the 1920s through the 2020s has a similar
-count (~1,800). That keeps ANOVA groups usable and GitHub-friendly. The full
-source file is ~107 MB and should not be committed.
+`tracks.csv` has **no genre column**. Genre is joined from the primary
+artist in `artists.csv`.
+
+The sample:
+
+- keeps **every cleaned Afrobeats-family track** (~2,100) so that family is usable
+- samples ~2,000 each of Hip hop, Latin, Pop, Rock, and Classical
+- adds a decade-balanced remainder for correlation / regression
+
+The full source file is ~107 MB and should not be committed.
 
 ## How this sample was filtered
 
@@ -46,3 +53,30 @@ source file is ~107 MB and should not be committed.
 | `valence` | numeric | 0–1; higher = more positive mood |
 | `tempo` | numeric | Beats per minute |
 | `time_signature` | integer | Estimated meter (1, 3, 4, or 5) |
+| `primary_genre` | character | First Spotify genre tag on the primary artist |
+| `artist_genres` | character | Up to eight artist tags, separated by `"; "` |
+| `genre_family` | character | Coarse family used in ANOVA (see below) |
+
+## Genre families
+
+This 2021 dump **does not contain a tag named `afrobeats`**. Modern Afrobeats
+is usually tagged `afropop`, `nigerian pop`, `azonto`, `azontobeats`, or
+`afro dancehall`. Classic Fela-style music is tagged `afrobeat`. Both are
+rolled into **Afrobeats** so the group is large enough for ANOVA.
+
+| `genre_family` | Example artist tags | Role |
+| --- | --- | --- |
+| Afrobeats | afropop, afrobeat, nigerian pop, azonto, afroswing, amapiano | Target group; all rows kept |
+| Hip hop | hip hop, rap, pop rap, trap | High-danceability comparison |
+| Latin | latin, latin pop, reggaeton | High-danceability comparison |
+| Pop | pop, dance pop, electropop | High-volume comparison |
+| Rock | rock, classic rock, album rock | Lower-danceability comparison |
+| Classical | classical, orchestra | Low-danceability comparison |
+| R&B / Soul, EDM, Country | matching tags | Present, but thin in this sample |
+| Other tagged / Untagged | everything else | Use for correlation, not genre ANOVA |
+
+A track is assigned the **first matching family** in the table order, using
+the primary artist's tags. Artists can have several tags, so this is a
+proxy, not a gold-standard genre label.
+
+Rebuild with `python3 scripts/build_analysis_csv.py`.

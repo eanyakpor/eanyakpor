@@ -101,3 +101,17 @@ if (requireNamespace("hexbin", quietly = TRUE)) {
   print(p_hex)
   ggsave("output/hex_energy_acousticness.png", p_hex, width = 7, height = 5)
 }
+
+if (!exists("genre_compare")) source("R/00_setup_and_clean.R")
+set.seed(42)
+genre_plot <- genre_compare %>% sample_n(min(3000, nrow(genre_compare)))
+p_genre <- ggplot(genre_plot, aes(valence, danceability, color = genre_family)) +
+  geom_point(alpha = 0.35, size = 1.3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    title = "Danceability vs valence by genre family",
+    x = "Valence", y = "Danceability", color = "Genre"
+  ) +
+  theme_minimal()
+print(p_genre)
+ggsave("output/scatter_dance_valence_genre.png", p_genre, width = 8, height = 5)

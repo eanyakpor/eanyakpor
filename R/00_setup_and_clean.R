@@ -43,8 +43,20 @@ tracks <- tracks_raw %>%
         TRUE ~ "2000-2020"
       ),
       levels = c("1921-1969", "1970-1999", "2000-2020")
+    ),
+    genre_family = factor(
+      genre_family,
+      levels = c(
+        "Afrobeats", "Hip hop", "Latin", "Pop", "Rock", "Classical",
+        "R&B / Soul", "EDM", "Country", "Other tagged", "Untagged"
+      )
     )
   )
+
+# Six families with enough songs for genre ANOVA / regression
+genre_compare <- tracks %>%
+  filter(genre_family %in% c("Afrobeats", "Hip hop", "Latin", "Pop", "Rock", "Classical")) %>%
+  mutate(genre_family = droplevels(forcats::fct_relevel(genre_family, "Afrobeats")))
 
 # Optional: drop the 2020s if you want complete decades only
 tracks_no_2020s <- tracks %>% filter(decade < 2020)
@@ -52,4 +64,8 @@ tracks_no_2020s <- tracks %>% filter(decade < 2020)
 dir.create("output", showWarnings = FALSE)
 saveRDS(tracks, file.path("output", "tracks_clean.rds"))
 
-message("Ready. ", nrow(tracks), " tracks loaded.")
+message(
+  "Ready. ", nrow(tracks), " tracks loaded. Genre ANOVA subset: ",
+  nrow(genre_compare), " tracks."
+)
+print(table(genre_compare$genre_family))

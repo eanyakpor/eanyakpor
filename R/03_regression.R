@@ -120,3 +120,30 @@ m_era <- lm(
 print(summary(m_era))
 print(broom::glance(m))
 print(broom::glance(m_era))
+
+# --- Genre-adjusted danceability model -------------------------------------
+# H0: after energy, valence, and acousticness are held fixed, genre family
+#     is unrelated to danceability (all genre dummies = 0 vs Afrobeats).
+if (!exists("genre_compare")) source("R/00_setup_and_clean.R")
+
+m_afro <- lm(
+  danceability ~ energy + valence + acousticness + genre_family,
+  data = genre_compare
+)
+print(summary(m_afro))
+print(car::vif(m_afro))
+
+coef_afro <- broom::tidy(m_afro, conf.int = TRUE) %>%
+  filter(term != "(Intercept)")
+p_afro <- ggplot(coef_afro, aes(estimate, reorder(term, estimate))) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_errorbarh(aes(xmin = conf.low, xmax = conf.high), height = 0.2) +
+  geom_point(size = 3) +
+  labs(
+    title = "Danceability coefficients (reference: Afrobeats)",
+    subtitle = "Negative genre dummies mean that family is less danceable than Afrobeats, holding audio features fixed",
+    x = "Coefficient", y = NULL
+  ) +
+  theme_minimal()
+print(p_afro)
+ggsave("output/reg_genre_danceability.png", p_afro, width = 8, height = 5)

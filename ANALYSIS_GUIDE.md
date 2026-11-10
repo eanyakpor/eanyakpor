@@ -13,10 +13,13 @@ colSums(is.na(tracks))
 ```
 
 Then run `R/00_setup_and_clean.R` so `era`, `decade_label`, `energy_level`,
-and `mode_label` are real factors.
+`mode_label`, and `genre_family` are real factors. That script also builds
+`genre_compare`, the six-family subset used for the Afrobeats ANOVA.
 
 Spot-check a few rows. `artists` should look like `The Beatles`, not
 `['The Beatles']`. `duration_min` should be a few minutes, not 180000.
+Afrobeats rows should have tags such as `afropop` or `afrobeat` in
+`artist_genres`.
 
 ---
 
@@ -79,24 +82,34 @@ groups.
 
 ### Recommended primary test (one-way)
 
-**Outcome:** `acousticness`  
-**Groups:** `era` (1921–1969, 1970–1999, 2000–2020)
+**Outcome:** `danceability`  
+**Groups:** `genre_family` — Afrobeats, Hip hop, Latin, Pop, Rock, Classical  
+Use `genre_compare`, not the full file (Other tagged / Untagged would drown the test).
 
-- **H0:** μ_early = μ_mid = μ_recent  
-- **Ha:** at least one era mean differs
+- **H0:** all six genre means are equal  
+- **Ha:** at least one genre mean differs
 
-This is easy to interpret: later popular music is, on average, less acoustic.
+Afrobeats is **more danceable than pop, rock, and classical**, but **not** the
+most danceable family in this dump — hip hop (and often latin) score higher.
+That is a stronger write-up than “Afrobeats is the most danceable genre.”
+
+There is no column named Afrobeats on the raw tracks file. See the codebook
+for the artist-tag mapping. The sample keeps every cleaned Afrobeats track
+because the family is small (~2,100 rows). Rock/pop/classical are huge in
+the raw data; they are downsampled.
+
+**Backup:** `acousticness ~ era` (1921–1969, 1970–1999, 2000–2020).
 
 ### Other ANOVA options on this data
 
 | Model | Groups | Comment |
 | --- | --- | --- |
-| `acousticness ~ era` | 3 | Best default |
-| `acousticness ~ decade_label` | 10–11 | Fine; more pairwise tests |
-| `danceability ~ energy_level` | Low/Med/High | 3 groups, not time-based |
-| `valence ~ time_signature` | 3, 4, 5 (drop 1 if thin) | Weaker story |
-| `energy ~ era * mode_label` | two-way | Add if you need interaction |
-| `popularity ~ era` | 3 | Significant, but popularity is biased toward new songs |
+| `danceability ~ genre_family` | 6 | Best default; use `genre_compare` |
+| `valence ~ genre_family` | 6 | Afrobeats is also high-valence |
+| `acousticness ~ era` | 3 | Time-based backup |
+| `danceability ~ energy_level` | Low/Med/High | 3 groups, not genre |
+| `energy ~ era * mode_label` | two-way | Interaction option |
+| `popularity ~ era` | 3 | Significant, but popularity favors new songs |
 
 Avoid `mode` alone (only two groups → that’s a *t*-test, not ANOVA).
 Avoid `key` unless you have a music-theory reason; 12 groups eat power and
@@ -114,10 +127,10 @@ are hard to explain.
 ### Tests and follow-ups
 
 ```r
-fit <- aov(acousticness ~ era, data = tracks)
+fit <- aov(danceability ~ genre_family, data = genre_compare)
 summary(fit)
 TukeyHSD(fit)
-oneway.test(acousticness ~ era, data = tracks, var.equal = FALSE)  # Welch
+oneway.test(danceability ~ genre_family, data = genre_compare, var.equal = FALSE)
 ```
 
 Report:
@@ -174,6 +187,7 @@ not enough for this requirement.
 | --- | --- | --- |
 | `popularity` | `danceability + energy + acousticness` | Minimum legal model |
 | `popularity` | audio features + `era` | Mix of numeric + dummy variables |
+| `danceability` | `energy + valence + acousticness + genre_family` | Tests Afrobeats after controls; reference = Afrobeats |
 | `valence` | `danceability + energy + acousticness + mode_label` | Mood as outcome |
 | `energy` | `loudness + acousticness + instrumentalness` | High R²; more “audio mixing” than “hits” |
 | `popularity` | `danceability * energy + acousticness` | Interaction if you want one extra trick |

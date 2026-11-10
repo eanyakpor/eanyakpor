@@ -11,7 +11,7 @@ so your write-up matches the code.
 
 | Path | Purpose |
 | --- | --- |
-| `data/spotify_tracks_analysis.csv` | 20,000-track stratified sample, ready to import |
+| `data/spotify_tracks_analysis.csv` | ~21k tracks with artist genre families, including all Afrobeats |
 | `data/codebook.md` | Column definitions and filter rules |
 | `R/install_packages.R` | One-time package install |
 | `R/00_setup_and_clean.R` | Import + factor recodes |
@@ -20,8 +20,10 @@ so your write-up matches the code.
 | `R/03_regression.R` | Multiple linear regression |
 | `ANALYSIS_GUIDE.md` | Which tests/graphs to use and how to interpret them |
 
-The original `tracks.csv` is ~107 MB, so it is **not** committed. The sample
-keeps a similar number of songs from each decade so ANOVA groups are usable.
+The original `tracks.csv` is ~107 MB, so it is **not** committed. Genre is
+**not** on the track file; it is joined from the artist. Afrobeats is uncommon
+here (~2,100 cleaned tracks), so every one of those rows is kept. Rock, pop,
+and classical have far more songs in the raw dump.
 
 ## Clean here or clean in R?
 
@@ -65,11 +67,12 @@ Energy vs loudness (strong +), energy vs acousticness (strong −),
 danceability vs valence (moderate +), energy vs popularity (weaker).
 
 **ANOVA**  
-`acousticness ~ era` with three eras: 1921–1969, 1970–1999, 2000–2020.  
-Backup: `danceability ~ energy_level` (Low / Medium / High).
+`danceability ~ genre_family` with Afrobeats, Hip hop, Latin, Pop, Rock, and Classical.  
+Backup: `acousticness ~ era` (1921–1969 / 1970–1999 / 2000–2020).
 
 **Multiple regression**  
-`popularity ~ danceability + energy + acousticness + valence + loudness + duration_min`.
+`popularity ~ danceability + energy + acousticness + valence + loudness + duration_min`  
+and `danceability ~ energy + valence + acousticness + genre_family` (Afrobeats as the reference).
 
 Details, assumption checks, graph types, and limitations:
 [ANALYSIS_GUIDE.md](ANALYSIS_GUIDE.md).
