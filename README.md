@@ -11,7 +11,9 @@ so your write-up matches the code.
 
 | Path | Purpose |
 | --- | --- |
-| `data/spotify_tracks_analysis.csv` | ~21k tracks with artist genre families, including all Afrobeats |
+| `data/spotify_tracks_analysis.csv` | ~21k tracks for **R** (keep this file for the scripts) |
+| `data/spotify_tracks_google_sheets.csv` | Same data with readable column names for Sheets/Excel |
+| `data/spotify_tracks_preview_500.csv` | First 500 rows, easier to skim |
 | `data/codebook.md` | Column definitions and filter rules |
 | `R/install_packages.R` | One-time package install |
 | `R/00_setup_and_clean.R` | Import + factor recodes |
@@ -59,6 +61,28 @@ the model that uses the variable.
    `ANALYSIS_GUIDE.md`.
 
 If you prefer clicking: open each `R/*.R` file and use **Source**.
+
+## Browse the data (Google Sheets or Excel)
+
+Do **not** replace `spotify_tracks_analysis.csv`. R needs those short column names (`danceability`, `genre_family`, …).
+
+**Google Sheets**
+
+1. Pull the latest branch so you have the new files (`git pull`).
+2. Open [Google Sheets](https://sheets.google.com) → **Blank spreadsheet**.
+3. **File → Import → Upload**.
+4. Upload `data/spotify_tracks_google_sheets.csv`  
+   (or the 500-row `data/spotify_tracks_preview_500.csv` if you only want a peek).
+5. Import location: **Replace current sheet**. Separator: **Comma**. Click **Import data**.
+6. Freeze the header: click row 1 → **View → Freeze → 1 row**. Turn on filter: **Data → Create a filter**.
+
+Direct download from GitHub (while on the analysis branch): open the file on GitHub → **Download raw file**, then import that.
+
+**Excel / Numbers:** double-click `spotify_tracks_google_sheets.csv`, or **File → Import**.
+
+**Inside RStudio (no spreadsheet):** after `source("R/00_setup_and_clean.R")` run `View(tracks)` for a clickable table.
+
+The Sheets file uses labels like `Genre family` and `Danceability (0-1)`, and rounds decimals to 3 places. Use it to look at the data; keep running models on the original CSV.
 
 ## Suggested models (ready to defend)
 
