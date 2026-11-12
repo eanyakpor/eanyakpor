@@ -1,0 +1,12 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.html
+!data/browse_preview.html
+*.png
+output/
+data/raw/
+.DS_Store
+__pycache__/
+.venv/
