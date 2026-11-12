@@ -80,7 +80,15 @@ Direct download from GitHub (while on the analysis branch): open the file on Git
 
 **Excel / Numbers:** double-click `spotify_tracks_google_sheets.csv`, or **File → Import**.
 
-**Inside RStudio (no spreadsheet):** after `source("R/00_setup_and_clean.R")` run `View(tracks)` for a clickable table.
+**Inside RStudio (spreadsheet or Viewer webview):**
+
+```r
+source("R/04_browse_data.R")
+```
+
+That opens `View()` (Excel-like grid) and a searchable HTML table in the **Viewer** pane. Filter **Genre family** to Afrobeats.
+
+**In a browser:** open `data/browse_preview.html` (first 200 rows + counts). In RStudio Files pane: click the file → **View in Web Browser**. On a Mac you can also double-click it in Finder.
 
 The Sheets file uses labels like `Genre family` and `Danceability (0-1)`, and rounds decimals to 3 places. Use it to look at the data; keep running models on the original CSV.
 

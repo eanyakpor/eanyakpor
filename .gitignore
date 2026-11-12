@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 *.html
+!data/browse_preview.html
 *.png
 output/
 data/raw/
